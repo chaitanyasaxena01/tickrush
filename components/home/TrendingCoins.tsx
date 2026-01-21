@@ -73,14 +73,18 @@ export default async function TrendingCoins() {
     }
 
     return (
-        <div id="trending-coins">
-            <h4>🔥 Trending Coins</h4>
-            <DataTable
-                columns={columns}
-                data={trendingCoins}
-                rowKey={(coin) => coin.item.id}
-                tableClassName="trending-coins-table"
-            />
+        <div id="trending-coins" className="rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-[var(--glass-shadow-md)] backdrop-blur-md overflow-hidden h-full">
+            <h4 className="px-6 py-4 text-xl font-bold font-orbitron text-[var(--glass-text)] border-b border-[var(--glass-border)]">
+                🔥 Trending Coins
+            </h4>
+            <div className="p-2">
+                <DataTable
+                    columns={columns}
+                    data={trendingCoins}
+                    rowKey={(coin) => coin.item.id}
+                    tableClassName="trending-coins-table"
+                />
+            </div>
         </div>
     );
 }
