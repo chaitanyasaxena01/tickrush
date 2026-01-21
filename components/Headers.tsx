@@ -1,11 +1,16 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import SearchModal from "@/components/SearchModal";
 
-const Headers = () => {
+interface HeadersProps {
+  trendingCoins?: TrendingCoin[];
+}
+
+export default function Headers({ trendingCoins = [] }: HeadersProps) {
   const pathname = usePathname();
 
   return (
@@ -16,20 +21,28 @@ const Headers = () => {
         </Link>
 
         <nav>
-          <Link href='/' className={cn('nav-link', {
-          'is-active' : pathname==='/', 
-          'is-home': true
-          })}>Home</Link>
+          <Link
+            href="/"
+            className={cn("nav-link", {
+              "is-active": pathname === "/",
+              "is-home": true,
+            })}
+          >
+            Home
+          </Link>
 
-          <p>Search modal</p>
+          <SearchModal trendingCoins={trendingCoins} />
 
-          <Link href="/coins" className={cn('nav-link', {
-            'is-active': pathname=== '/coins',
-          })}>All coins</Link>
+          <Link
+            href="/coins"
+            className={cn("nav-link", {
+              "is-active": pathname === "/coins" || pathname.startsWith("/coins/"),
+            })}
+          >
+            All Coins
+          </Link>
         </nav>
       </div>
     </header>
   );
-};
-
-export default Headers;
+}
