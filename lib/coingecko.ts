@@ -2,22 +2,47 @@
 const COINGECKO_API_URL = "https://api.coingecko.com/api/v3";
 const COINGECKO_PRO_API_URL = "https://pro-api.coingecko.com/api/v3";
 
-function getApiUrl(): string {
-    return process.env.COINGECKO_API_KEY ? COINGECKO_PRO_API_URL : COINGECKO_API_URL;
-}
-
-function getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-        Accept: "application/json",
-    };
-
-    if (process.env.COINGECKO_API_KEY) {
-        headers["x-cg-pro-api-key"] = process.env.COINGECKO_API_KEY;
-    } else if (process.env.COINGECKO_DEMO_API_KEY) {
-        headers["x-cg-demo-api-key"] = process.env.COINGECKO_DEMO_API_KEY;
+function getApiConfig(): { url: string; headers: HeadersInit } {
+    // Check for Pro API key first (paid tier)
+    if (process.env.COINGECKO_PRO_API_KEY) {
+        return {
+            url: COINGECKO_PRO_API_URL,
+            headers: {
+                Accept: "application/json",
+                "x-cg-pro-api-key": process.env.COINGECKO_PRO_API_KEY,
+            },
+        };
     }
 
-    return headers;
+    // Check for Demo API key (free tier with key)
+    if (process.env.COINGECKO_DEMO_API_KEY) {
+        return {
+            url: COINGECKO_API_URL,
+            headers: {
+                Accept: "application/json",
+                "x-cg-demo-api-key": process.env.COINGECKO_DEMO_API_KEY,
+            },
+        };
+    }
+
+    // Check for generic API key (user provides, we'll try demo endpoint first)
+    if (process.env.COINGECKO_API_KEY) {
+        return {
+            url: COINGECKO_API_URL,
+            headers: {
+                Accept: "application/json",
+                "x-cg-demo-api-key": process.env.COINGECKO_API_KEY,
+            },
+        };
+    }
+
+    // Fallback - use public API without key (very limited)
+    return {
+        url: COINGECKO_API_URL,
+        headers: {
+            Accept: "application/json",
+        },
+    };
 }
 
 async function fetchWithRetry<T>(
@@ -25,11 +50,13 @@ async function fetchWithRetry<T>(
     options: RequestInit = {},
     retries = 3
 ): Promise<T> {
+    const config = getApiConfig();
+
     try {
         const response = await fetch(url, {
             ...options,
             headers: {
-                ...getHeaders(),
+                ...config.headers,
                 ...options.headers,
             },
             next: { revalidate: 60 }, // Cache for 60 seconds
@@ -48,6 +75,9 @@ async function fetchWithRetry<T>(
                 const errorBody = await response.json();
                 if (errorBody.error) {
                     errorMessage = `CoinGecko API error: ${errorBody.error}`;
+                }
+                if (errorBody.status?.error_message) {
+                    errorMessage = `CoinGecko API error: ${errorBody.status.error_message}`;
                 }
             } catch {
                 // Ignore JSON parsing errors
@@ -68,7 +98,8 @@ async function fetchWithRetry<T>(
 }
 
 function buildUrl(endpoint: string, params: QueryParams = {}): string {
-    const url = new URL(`${getApiUrl()}${endpoint}`);
+    const config = getApiConfig();
+    const url = new URL(`${config.url}${endpoint}`);
     Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
             url.searchParams.append(key, String(value));
