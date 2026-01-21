@@ -3,6 +3,7 @@ import TrendingCoins from "@/components/home/TrendingCoins";
 import CoinOverview from "@/components/home/CoinOverview";
 import TopCategories from "@/components/home/TopCategories";
 import TopGainersLosers from "@/components/home/TopGainersLosers";
+import HomeStats from "@/components/home/HomeStats";
 import { fetchTopGainersLosers } from "@/lib/coingecko";
 
 // Loading skeletons
@@ -115,31 +116,53 @@ export default async function Home() {
   const { gainers, losers } = await getTopGainersLosers();
 
   return (
-    <main className="main-container">
-      {/* Hero Section - Overview and Trending */}
-      <section className="home-grid">
-        <Suspense fallback={<CoinOverviewSkeleton />}>
-          <CoinOverview />
-        </Suspense>
+    <main className="min-h-screen bg-[var(--color-background)] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[var(--glass-secondary)] via-[var(--color-background)] to-[var(--color-background)] p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-        <Suspense fallback={<TrendingCoinsSkeleton />}>
-          <TrendingCoins />
-        </Suspense>
-      </section>
+        {/* Header - could be moved to a component */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold font-orbitron text-[var(--glass-text)]">
+              Market Overview
+            </h2>
+            <p className="text-[var(--glass-text)] opacity-70 font-exo-2 mt-1">
+              Live updates and trends from the crypto market.
+            </p>
+          </div>
+        </div>
 
-      {/* Categories Section */}
-      <section className="w-full mt-7 space-y-4">
-        <Suspense fallback={<CategoriesSkeleton />}>
-          <TopCategories />
-        </Suspense>
-      </section>
+        {/* Home Stats Row */}
+        <section className="mb-8">
+          <HomeStats />
+        </section>
 
-      {/* Top Gainers & Losers Section */}
-      <section className="w-full mt-7">
-        <Suspense fallback={<TopGainersLosersSkeleton />}>
-          <TopGainersLosers initialGainers={gainers} initialLosers={losers} />
-        </Suspense>
-      </section>
+        {/* Hero Section - Overview and Trending */}
+        <section className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+          <Suspense fallback={<CoinOverviewSkeleton />}>
+            <CoinOverview />
+          </Suspense>
+
+          <div className="xl:col-span-1 h-full">
+            <Suspense fallback={<TrendingCoinsSkeleton />}>
+              <TrendingCoins />
+            </Suspense>
+          </div>
+        </section>
+
+        {/* Categories Section */}
+        <section className="w-full mb-8">
+          <Suspense fallback={<CategoriesSkeleton />}>
+            <TopCategories />
+          </Suspense>
+        </section>
+
+        {/* Top Gainers & Losers Section */}
+        <section className="w-full">
+          <Suspense fallback={<TopGainersLosersSkeleton />}>
+            <TopGainersLosers initialGainers={gainers} initialLosers={losers} />
+          </Suspense>
+        </section>
+      </div>
     </main>
   );
 }

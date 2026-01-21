@@ -1,0 +1,23 @@
+<svg width="180" height="60" viewBox="0 0 180 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Checkmark Icon -->
+  <g transform="translate(5, 10)">
+    <!-- Amber checkmark -->
+    <path d="M8 20 L15 27 L28 10" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Violet swoosh -->
+    <path d="M10 30 Q20 33 30 28" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+  </g>
+  
+  <!-- TickRush Text -->
+  <text x="45" y="37" font-family="Orbitron, sans-serif" font-size="20" font-weight="600" fill="url(#textGradient)">
+    TickRush
+  </text>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FBBF24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C084FC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

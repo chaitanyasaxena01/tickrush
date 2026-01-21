@@ -80,13 +80,17 @@ export default async function TopCategories() {
     }
 
     return (
-        <div id="categories">
-            <h4>📊 Top Categories</h4>
-            <DataTable
-                columns={columns}
-                data={topCategories}
-                rowKey={(category) => category.name}
-            />
+        <div id="categories" className="rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-[var(--glass-shadow-md)] backdrop-blur-md overflow-hidden mt-8">
+            <h4 className="px-6 py-4 text-xl font-bold font-orbitron text-[var(--glass-text)] border-b border-[var(--glass-border)]">
+                📊 Top Categories
+            </h4>
+            <div className="p-2">
+                <DataTable
+                    columns={columns}
+                    data={topCategories}
+                    rowKey={(category) => category.name}
+                />
+            </div>
         </div>
     );
 }

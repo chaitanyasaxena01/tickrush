@@ -17,7 +17,7 @@ export default function Headers({ trendingCoins = [] }: HeadersProps) {
     <header>
       <div className="main-container inner">
         <Link href="/">
-          <Image src="/logo.svg" alt="Tickrush logo" width={132} height={40} />
+          <Image src="/tickrush-logo.svg" alt="TickRush Logo" width={180} height={60} className="object-contain" />
         </Link>
 
         <nav>
