@@ -1,7 +1,8 @@
 {
-  "name": "ecommerce",
-  "version": "0.1.0",
+  "name": "tickrush",
+  "version": "1.0.0",
   "private": true,
+  "description": "Real-time cryptocurrency screener and dashboard using CoinGecko API",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +12,6 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.562.0",
     "next": "^16.1.1-canary.33",
     "react": "19.2.3",
     "react-dom": "19.2.3",
