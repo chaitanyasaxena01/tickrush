@@ -1,66 +1,145 @@
-import Image from "next/image";
-import React from "react";
-import DataTable from "@/components/DataTable";
-import Link from "next/link";
+import { Suspense } from "react";
+import TrendingCoins from "@/components/home/TrendingCoins";
+import CoinOverview from "@/components/home/CoinOverview";
+import TopCategories from "@/components/home/TopCategories";
+import TopGainersLosers from "@/components/home/TopGainersLosers";
+import { fetchTopGainersLosers } from "@/lib/coingecko";
 
-const columns: DataTableColumn<TrendingCoin>[] = [
-  {
-    header: "Name",
-    cellClassName: "name-cell",
-    cell: (coin) => {
-      const item = coin.item;
-
-      return (
-        <Link href={`/coins/${item.id}`}>
-          <Image src={item.large} alt={item.name} width={36} height={36} />
-          <p>{item.name}</p>
-        </Link>
-      );
-    },
-  {
-    header: '24 Change',
-    cellClassName: 'name-cell',
-    cell: (coin) => {
-      const item = coin.item;
-      const isTrendingUp = item.data.price_change_percentage_24h.usd > 0;
-
-      return (
-        <div classname={cn('price-change', isTrendingUP ? 'text-green-500',: 'text-red-500')}>
-          
-        </div>
-      )
-    }
-  }
-  },
-];
-
-const Page = () => {
+// Loading skeletons
+function TrendingCoinsSkeleton() {
   return (
-    <main className="main-container">
-      <section className="home-grid">
-        <div id="coin-overview">
-          <div className="header pt-2">
-            <Image
-              src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579"
-              alt="Bitcoin Logo"
-              width={56}
-              height={56}
-            />
-            <div className="info">
-              <p>Bitcoin / BTC</p>
-              <h1>$42,321.00</h1>
+    <div id="trending-coins-fallback">
+      <h4>🔥 Trending Coins</h4>
+      <div className="trending-coins-table">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between p-4 border-b border-purple-100/5">
+            <div className="flex items-center gap-3">
+              <div className="skeleton size-9 rounded-full" />
+              <div className="skeleton h-4 w-24" />
+            </div>
+            <div className="skeleton h-4 w-16" />
+            <div className="skeleton h-4 w-14" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CoinOverviewSkeleton() {
+  return (
+    <div id="coin-overview-fallback" className="xl:col-span-2">
+      <div className="header">
+        <div className="skeleton header-image" />
+        <div className="info">
+          <div className="skeleton header-line-sm" />
+          <div className="skeleton header-line-lg" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4 mt-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex flex-col gap-2">
+            <div className="skeleton h-3 w-16" />
+            <div className="skeleton h-5 w-24" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CategoriesSkeleton() {
+  return (
+    <div id="categories-fallback">
+      <h4>📊 Top Categories</h4>
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center justify-between p-4 border-b border-purple-100/5">
+          <div className="skeleton category-skeleton" />
+          <div className="flex gap-1">
+            {[...Array(3)].map((_, j) => (
+              <div key={j} className="skeleton coin-skeleton" />
+            ))}
+          </div>
+          <div className="skeleton value-skeleton-sm" />
+          <div className="skeleton value-skeleton-md" />
+          <div className="skeleton value-skeleton-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TopGainersLosersSkeleton() {
+  return (
+    <div id="top-gainers-losers">
+      <div className="tabs-list">
+        <div className="skeleton h-8 w-32" />
+        <div className="skeleton h-8 w-32" />
+      </div>
+      <div className="tabs-content">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-dark-500 p-5 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="skeleton size-12 rounded-full" />
+              <div className="flex flex-col gap-2">
+                <div className="skeleton h-4 w-24" />
+                <div className="skeleton h-3 w-12" />
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div className="skeleton h-6 w-24" />
+              <div className="skeleton h-5 w-16" />
             </div>
           </div>
-        </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-        <p> Trending Coins </p>
-        <DataTable />
+// Safe wrapper functions for API calls
+async function getTopGainersLosers() {
+  try {
+    const [gainers, losers] = await Promise.all([
+      fetchTopGainersLosers("gainers", 4),
+      fetchTopGainersLosers("losers", 4),
+    ]);
+    return { gainers, losers };
+  } catch (error) {
+    console.error("Failed to fetch gainers/losers:", error);
+    return { gainers: [], losers: [] };
+  }
+}
+
+export default async function Home() {
+  const { gainers, losers } = await getTopGainersLosers();
+
+  return (
+    <main className="main-container">
+      {/* Hero Section - Overview and Trending */}
+      <section className="home-grid">
+        <Suspense fallback={<CoinOverviewSkeleton />}>
+          <CoinOverview />
+        </Suspense>
+
+        <Suspense fallback={<TrendingCoinsSkeleton />}>
+          <TrendingCoins />
+        </Suspense>
       </section>
+
+      {/* Categories Section */}
       <section className="w-full mt-7 space-y-4">
-        <p>Top Categories</p>
+        <Suspense fallback={<CategoriesSkeleton />}>
+          <TopCategories />
+        </Suspense>
+      </section>
+
+      {/* Top Gainers & Losers Section */}
+      <section className="w-full mt-7">
+        <Suspense fallback={<TopGainersLosersSkeleton />}>
+          <TopGainersLosers initialGainers={gainers} initialLosers={losers} />
+        </Suspense>
       </section>
     </main>
   );
-};
-
-export default Page;
+}
